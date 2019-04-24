@@ -1,66 +1,45 @@
-// import React from 'react';
-// import ReactDOM from 'react-dom';
-
-// ReactDOM.render(
-//   <p>1</p>,
-//   document.getElementById('root')
-// )
-
-
-//首字母必须要大写,return内容较多使用小括号
-
+//组件的state（组件的状态）
 import React from 'react';
 import ReactDOM from 'react-dom';
-import adc from 'prop-types';
-
-//函数定义组件,解构赋值写法
-function Hello({ name,age }){
-  //console.log(props)
-  return(
-    <div>
-      hello
-      <Word name="lisi" age={20}></Word>
-      <p>{ name }</p>
-      <p>{ age }</p>
-    </div>
-  )
-}
 
 
-//函数的组件的props校验
-Hello.propTypes = {
-  name:adc.string,
-  age:adc.number
-}
+class Hello extends React.Component{
+//类可以定义构造函数，如定义了，就必须在构造函数第一行代码调用 父类的构造函数，也就是super() 方法
+  constructor(props){
+    super(props);
 
-//必须继承基础组件React.Component
-//类定义组件
-//带参要用this
-class Word extends React.Component{
+    this.state = {
+      name:'zhangsan',
+      age:18
+    }
+  }
+
+//state不允许直接修改，要用setState
+  fn1(){
+    this.setState({
+      name:'lisi',
+      age:20
+    })
+  }
+
+//事件使用驼峰写法onClick,事件处理函数不能加括号,this指向需关注，一半要用 .bind(this) 改变
   render(){
     return(
       <div>
-        reacts
-        <p>{ this.props.name }</p>
-        <p>{ this.props.age }</p>
+        react
+        <p>{ this.state.name }</p>
+        <p>{ this.state.age }</p>
+        <button onClick={ this.fn1.bind(this) }>改name</button>
       </div>
     )
   }
 }
 
 
-//类的组件的props校验
-Word.propTypes = {
-  name:adc.string,
-  age:adc.number
-}
-
-
 
 ReactDOM.render(
-  <Hello name="zhnagsan" age={18}></Hello>,
+  <div>
+    <Hello></Hello>
+  </div>,
   document.getElementById('root')
 )
-
-
-
