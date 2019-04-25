@@ -1,74 +1,90 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
+import ReactDOM from 'react-dom'
 
+class BoilingVerdict extends React.Component{
 
-//状态提升
-function inputProtected(input){
-  if(Number.isNaN(input) || input <= 0){
+   render(){
+    if(this.props.celsius>=100){
+        return <p>沸腾</p>;
+    }
+    return <p>不沸腾</p>;
+   }
+}
+class Calculator extends React.Component{
+    constructor(props){
+        super(props);
+        this.handleCelsiusChange = this.handleCelsiusChange.bind(this);
+        this.handleFahrenheitChange = this.handleFahrenheitChange.bind(this);
+        this.state = {temperature: '', scale: 'c'};
+    }
+    handleCelsiusChange(temperature) {
+        this.setState({scale: 'c', temperature});
+    }
+    handleFahrenheitChange(temperature) {
+        this.setState({scale: 'f', temperature});
+    }
+    render(){
+        const scale = this.state.scale;
+        const temperature=this.state.temperature;
+        const celsius=scale==='f'?tryConvert(temperature,toCelsius):temperature;
+        const fahrenheit=scale==='c'?tryConvert(temperature,toFahrenheit):temperature;
+        return  (
+            <div>
+                <TemperatureInput scale="c"
+                    temperature={celsius}
+                    onTemperatureChange={this.handleCelsiusChange}
+                />
+                <TemperatureInput scale="f"
+                     temperature={fahrenheit}
+                     onTemperatureChange={this.handleFahrenheitChange}
+                />
+                <BoilingVerdict
+                celsius={parseFloat(celsius)} />
+            </div>
+        )
+    }
+}
+function toCelsius(fahrenheit) {
+    return (fahrenheit - 32) * 5 / 9;
+}
+function toFahrenheit(celsius) {
+return (celsius * 9 / 5) + 32;
+}
+function tryConvert(temperature, convert) {
+    const input = parseFloat(temperature);
+    if (Number.isNaN(input)) {
       return '';
-  }else{
-      return Math.floor(input).toString();
-  }
+    }
+    const output = convert(input);
+    const rounded = Math.round(output * 1000) / 1000;
+    return rounded.toString();
 }
-let dataTitle = {
-  m:'需要花多少钱：',
-  n:'能买这么多个：'
+const scaleNames = {
+    c: '摄氏度',
+    f: '华氏度'
 };
-
-class Calculation extends React.Component{
-  render(){
-      let data = this.props.data;
-      let title = this.props.title;
-      let changeDate = this.props.changeDate;
-      return (
-          <div>
-              <fieldset>
-                  <legend>{title}</legend>
-                  <input type="text" value={data} onChange={changeDate}/>
-              </fieldset>
-          </div>
-      );
-  }
-}
-
-class App extends React.Component{
-  constructor(props){
+class TemperatureInput extends React.Component {
+    constructor(props) {
       super(props);
-      this.state = {type:'money',input:''};
-  }
-  handleDate(type,e){
-      if(type === 'money'){
-          this.setState({type:'money',input:e.target.value});
-      }else if(type === 'number'){
-          this.setState({type:'number',input:e.target.value});
-      }
-  }
-  convertNumber(input){
-      return Math.floor(input/20);
-  }
-  convertMoney(input){
-      return input * 20;
-  }
-  render(){
-      let input = this.state.input;
-      let type = this.state.type;
-      let number = type==='money'  ? inputProtected(this.convertNumber.bind(this,input)()) : input;
-      let money  = type==='number' ? inputProtected(this.convertMoney.bind(this,input)()) : input;
+      this.handleChange = this.handleChange.bind(this);
+      this.state = {temperature: ''};
+    }
+    handleChange(e) {
+    //   this.setState({temperature: e.target.value});
+        this.props.onTemperatureChange(e.target.value);
+    }
+    render() {
+    //   const temperature = this.state.temperature;
+    const temperature = this.props.temperature;
+      const scale = this.props.scale;
       return (
-          <div>
-              <h4>价格：20元一个</h4>
-              <Calculation
-                  data={money}
-                  title={dataTitle.m}
-                  changeDate={(e)=>this.handleDate('money',e)}
-              />
-              <Calculation
-                  data={number}
-                  title={dataTitle.n}
-                  changeDate={(e)=>this.handleDate('number',e)}
-              />
-          </div>
+        <fieldset>
+          <legend>输入温度 {scaleNames[scale]}:</legend>
+          <input value={temperature}
+                 onChange={this.handleChange} />
+        </fieldset>
       );
+    }
   }
-}
-ReactDOM.render(<App/>,document.getElementById('root'));
+ReactDOM.render(<Calculator/>, document.getElementById('root'));
+
