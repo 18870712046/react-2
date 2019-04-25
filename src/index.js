@@ -1,45 +1,78 @@
-//组件的state（组件的状态）
+//setState是异步函数
 import React from 'react';
 import ReactDOM from 'react-dom';
 
-
-class Hello extends React.Component{
-//类可以定义构造函数，如定义了，就必须在构造函数第一行代码调用 父类的构造函数，也就是super() 方法
+class App extends React.Component{
   constructor(props){
-    super(props);
+    super(props)
 
-    this.state = {
-      name:'zhangsan',
-      age:18
+    //性能优化的bind方式
+    this.dianji = this.dianji.bind(this);
+
+    this.state={
+      count:1
     }
   }
 
-//state不允许直接修改，要用setState
-  fn1(){
-    this.setState({
-      name:'lisi',
-      age:20
-    })
-  }
+dianji(){
+  //setState是异步函数
+  this.setState({
+    count:this.state.count + 1
+  },()=>{
+//异步回调,数据修改完后触发
+  console.log(this.state.count)
+  })
 
-//事件使用驼峰写法onClick,事件处理函数不能加括号,this指向需关注，一半要用 .bind(this) 改变
+
+
+//react底层代码实现了将setState合并为一个去执行
+  // this.setState({
+  //   count:this.state.count + 1
+  // })
+  // this.setState({
+  //   count:this.state.count + 1
+  // })
+  // this.setState({
+  //   count:this.state.count + 1
+  // })
+  // this.setState({
+  //   count:this.state.count + 1
+  // })
+  // this.setState({
+  //   count:this.state.count + 1
+  // })
+
+  //实现加5的功能
+  // this.setState((prevState)=>({
+  //   count:prevState.count + 1
+  // }))
+  // this.setState((prevState)=>({
+  //   count:prevState.count + 1
+  // }))
+  // this.setState((prevState)=>({
+  //   count:prevState.count + 1
+  // }))
+  // this.setState((prevState)=>({
+  //   count:prevState.count + 1
+  // }))
+  // this.setState((prevState)=>({
+  //   count:prevState.count + 1
+  // }))
+
+}
+
   render(){
     return(
       <div>
-        react
-        <p>{ this.state.name }</p>
-        <p>{ this.state.age }</p>
-        <button onClick={ this.fn1.bind(this) }>改name</button>
+        { this.state.count }
+        <button onClick={ this.dianji }>+1</button>
       </div>
     )
   }
 }
 
 
-
 ReactDOM.render(
-  <div>
-    <Hello></Hello>
-  </div>,
+  <App/>,
   document.getElementById('root')
 )
