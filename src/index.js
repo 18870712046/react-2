@@ -1,78 +1,74 @@
-//setState是异步函数
 import React from 'react';
 import ReactDOM from 'react-dom';
 
+
+//状态提升
+function inputProtected(input){
+  if(Number.isNaN(input) || input <= 0){
+      return '';
+  }else{
+      return Math.floor(input).toString();
+  }
+}
+let dataTitle = {
+  m:'需要花多少钱：',
+  n:'能买这么多个：'
+};
+
+class Calculation extends React.Component{
+  render(){
+      let data = this.props.data;
+      let title = this.props.title;
+      let changeDate = this.props.changeDate;
+      return (
+          <div>
+              <fieldset>
+                  <legend>{title}</legend>
+                  <input type="text" value={data} onChange={changeDate}/>
+              </fieldset>
+          </div>
+      );
+  }
+}
+
 class App extends React.Component{
   constructor(props){
-    super(props)
-
-    //性能优化的bind方式
-    this.dianji = this.dianji.bind(this);
-
-    this.state={
-      count:1
-    }
+      super(props);
+      this.state = {type:'money',input:''};
   }
-
-dianji(){
-  //setState是异步函数
-  this.setState({
-    count:this.state.count + 1
-  },()=>{
-//异步回调,数据修改完后触发
-  console.log(this.state.count)
-  })
-
-
-
-//react底层代码实现了将setState合并为一个去执行
-  // this.setState({
-  //   count:this.state.count + 1
-  // })
-  // this.setState({
-  //   count:this.state.count + 1
-  // })
-  // this.setState({
-  //   count:this.state.count + 1
-  // })
-  // this.setState({
-  //   count:this.state.count + 1
-  // })
-  // this.setState({
-  //   count:this.state.count + 1
-  // })
-
-  //实现加5的功能
-  // this.setState((prevState)=>({
-  //   count:prevState.count + 1
-  // }))
-  // this.setState((prevState)=>({
-  //   count:prevState.count + 1
-  // }))
-  // this.setState((prevState)=>({
-  //   count:prevState.count + 1
-  // }))
-  // this.setState((prevState)=>({
-  //   count:prevState.count + 1
-  // }))
-  // this.setState((prevState)=>({
-  //   count:prevState.count + 1
-  // }))
-
-}
-
+  handleDate(type,e){
+      if(type === 'money'){
+          this.setState({type:'money',input:e.target.value});
+      }else if(type === 'number'){
+          this.setState({type:'number',input:e.target.value});
+      }
+  }
+  convertNumber(input){
+      return Math.floor(input/20);
+  }
+  convertMoney(input){
+      return input * 20;
+  }
   render(){
-    return(
-      <div>
-        { this.state.count }
-        <button onClick={ this.dianji }>+1</button>
-      </div>
-    )
+      let input = this.state.input;
+      let type = this.state.type;
+      let number = type==='money'  ? inputProtected(this.convertNumber.bind(this,input)()) : input;
+      let money  = type==='number' ? inputProtected(this.convertMoney.bind(this,input)()) : input;
+      return (
+          <div>
+              <h4>价格：20元一个</h4>
+              <Calculation
+                  data={money}
+                  title={dataTitle.m}
+                  changeDate={(e)=>this.handleDate('money',e)}
+              />
+              <Calculation
+                  data={number}
+                  title={dataTitle.n}
+                  changeDate={(e)=>this.handleDate('number',e)}
+              />
+          </div>
+      );
   }
 }
-
-
-ReactDOM.render(
-  <App/>,
-  document.getElementById('root')
-)
+ReactDOM.render(<App/>,document.getElementById('root'));
